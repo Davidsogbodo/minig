@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DialFi Airdrop Mining</title>
+    <link rel="icon" href="./images/favicon.ico" type="image/x-icon">
+    <meta name="description" content="Join DialFi's airdrop mining program to earn DiFi tokens. Mine every 12 hours, complete tasks, and climb the leaderboard!">
+    <meta name="theme-color" content="#1a202c">
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="css/styles.css" rel="stylesheet">
+    
+    <link rel="preload" href="app.js" as="script">
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold" id="authModalTitle">Login</h2>
+                <button id="closeAuthModal" class="text-gray-400 hover:text-white" aria-label="Close authentication modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="authForms">
+                <form id="loginForm" onsubmit="app.handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label for="loginEmail" class="block text-sm font-medium mb-1">Email</label>
+                        <input type="email" id="loginEmail" class="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required autocomplete="email">
+                    </div>
+                    <div>
+                        <label for="loginPassword" class="block text-sm font-medium mb-1">Password</label>
+                        <input type="password" id="loginPassword" class="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required autocomplete="current-password">
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="rememberMe" class="h-4 w-4 text-blue-500 rounded">
+                            <label for="rememberMe" class="ml-2 text-sm">Remember me</label>
+                        </div>
+                        <button type="button" id="showForgotPassword" class="text-sm text-blue-400 hover:text-blue-300">Forgot password?</button>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-md font-medium transition">Login</button>
+                    <p class="text-center text-sm">
+                        Don't have an account? 
+                        <button type="button" id="showRegister" class="text-blue-400 hover:text-blue-300">Register</button>
+                    </p>
+                </form>
+                
+                <form id="registerForm" onsubmit="app.handleRegister(event)" class="space-y-4 hidden">
+                    <div>
+                        <label for="registerEmail" class="block text-sm font-medium mb-1">Email</label>
+                        <input type="email" id="registerEmail" class="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required autocomplete="email">
+                    </div>
+                    <div>
+                        <label for="registerPassword" class="block text-sm font-medium mb-1">Password</label>
+                        <input type="password" id="registerPassword" class="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required minlength="8" autocomplete="new-password">
+                    </div>
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium mb-1">Confirm Password</label>
+                        <input type="password" id="confirmPassword" class="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required minlength="8" autocomplete="new-password">
+                    </div>
+                    <div>
+                        <label for="referralCode" class="block text-sm font-medium mb-1">Referral Code (optional)</label>
+                        <input type="text" id="referralCode" class="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" autocomplete="off">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-md font-medium transition">Register</button>
+                    <p class="text-center text-sm">
+                        Already have an account? 
+                        <button type="button" id="showLogin" class="text-blue-400 hover:text-blue-300">Login</button>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container mx-auto px-4">
+        <header class="py-6 flex justify-between items-center border-b border-gray-800">
+            <div class="flex items-center space-x-2">
+                <img src="./images/Logo.jpg" 
+                    alt="DialFi Logo"
+                    class="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-full border-2 border-blue-500 mr-3 shrink-0 transition-transform hover:scale-105"
+                    loading="lazy"
+                    width="48" height="48"> <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">DialFi Airdrop</h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button id="authButton" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md font-medium transition">Login</button>
+                <button id="mobileMenuButton" class="md:hidden text-gray-400 hover:text-white" aria-label="Toggle mobile menu">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </header>
+        
+        <main class="py-8">
+            <section id="userDashboard" class="hidden">
+                <h2 id="dashboardHeading" class="sr-only">User Dashboard</h2>
+                
+                <section aria-labelledby="supplyHeading">
+                    <h3 id="supplyHeading" class="sr-only">Token Supply Information</h3>
+                    <div class="supply-banner bg-gradient-to-r from-purple-800 to-blue-700 rounded-xl p-6 mb-8 shadow-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-xl font-bold">Token Supply</h4> <div class="flex items-center">
+                                <span class="text-sm mr-2">Updated:</span>
+                                <span id="lastUpdated" class="text-xs bg-gray-700 px-2 py-1 rounded">Just now</span>
+                            </div>
+                        </div>
+                        <div class="flex items-end justify-between">
+                            </div>
+                        <div class="mt-2 flex justify-between text-xs text-gray-400">
+                            <span>Initial Supply: 100,000,000 DiFi</span>
+                            <span id="percentageMined">2.45% mined</span>
+                        </div>
+                    </div>
+                </section>
+                        <!-- MINE SECTION -->
+                <section class="bg-gray-800 rounded-xl p-6 shadow-lg mb-8">
+                    <h2 id="miningHeading" class="text-xl font-bold mb-4">Mine DiFi Tokens</h2>
+                    <p class="text-gray-300 mb-4">You can mine 0.25 DiFi every 12 hours</p>
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-400">Next mining available in:</p>
+                        <p class="text-xl font-mono" id="miningTimer">Ready to mine!</p>
+                    </div>
+                    <button id="mineButton" onclick="app.handleMine()"
+                    class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 py-3 px-6 
+                    md:py-2 md:px-4 rounded-md font-medium transition">
+                    Mine Now
+                    </button>
+                </section>
+                        <!-- TASK SECTION -->
+                <section class="bg-gray-800 rounded-xl p-6 shadow-lg mb-8">
+                    <h2 id="tasksHeading" class="text-xl font-bold mb-4">Complete Tasks</h2>
+                    <p class="text-gray-300 mb-4">Complete these tasks to earn 0.25 DiFi each</p>
+                    
+                    <div class="space-y-3" id="tasksContainer">
+                        <!-- Tasks will be dynamically inserted here -->
+                    </div>
+                </section>
+
+                     <!-- Referral  -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <section class="bg-gray-800 rounded-xl p-6 shadow-lg" aria-labelledby="referralHeading">
+                        <h3 id="referralHeading" class="text-lg font-bold mb-4">Referral Program</h3>
+                        <p class="text-gray-300 mb-4">Earn 2000 DPower for each friend who signs up with your code</p>
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-400">Your referral code:</p>
+                            <div class="flex items-center bg-gray-700 px-3 py-2 rounded-md mt-1">
+                                <span id="referralCodeDisplay" class="flex-1 font-mono">Loading...</span>
+                                <button id="copyReferral" class="ml-2 text-blue-400 hover:text-blue-300" aria-label="Copy referral code">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Total referrals:</p>
+                            <p class="text-xl font-bold" id="totalReferrals">0</p>
+                        </div>
+                    </section>
+
+                            <!--  DPower Sections -->
+                    <section class="bg-gray-800 rounded-xl p-6 shadow-lg" aria-labelledby="dpowerHeading">
+                        <h3 id="dpowerHeading" class="text-lg font-bold mb-4">DPower Points</h3>
+                        <p class="text-gray-300 mb-4">250 DPower = 0.25 DiFi</p>
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-400">Your DPower balance:</p>
+                            <p class="text-xl font-bold" id="dpowerBalance">0</p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button id="convertDpower" onclick="app.handleConvertDPower()" 
+                            class="flex-1 bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-md font-medium transition">
+                                Convert to DiFi
+                            </button>
+                            <button id="purchaseDpower" onclick="app.uiService.showPaymentModal()" 
+                            class="flex-1 bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-md font-medium transition">
+                                Buy DPower
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+                <section class="bg-gray-800 rounded-xl p-6 shadow-lg" aria-labelledby="leaderboardHeading">
+                    <h2 id="leaderboardHeading" class="text-xl font-bold mb-4">Top Miners</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left border-b border-gray-700">
+                                    <th class="pb-2">Rank</th>
+                                    <th class="pb-2">User</th>
+                                    <th class="pb-2">DiFi Mined</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+            
+            <section id="guestView" class="text-center py-12">
+                <div class="max-w-2xl mx-auto">
+                    <i class="fas fa-coins text-yellow-400 text-5xl mb-6"></i>
+                    <h2 class="text-3xl font-bold mb-4">Start Mining DiFi Tokens Today</h2>
+                    <p class="text-gray-300 mb-8">Join our airdrop mining program to earn DiFi tokens. Mine tokens every 12 hours and complete tasks to earn more!</p>
+                    <button id="guestAuthButton" onclick="app.uiService.showAuthModal()" 
+                    class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-md font-medium text-lg transition">Login or Register to Start</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+        <!-- staking modal -->
+    <div id="stakingModal" class="fixed inset-0 bg-black bg-opacity-75 
+    flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Stake Your DiFi</h2>
+                <button id="closeStakingModal" class="text-gray-400 hover:text-white" aria-label="Close staking modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label for="stakeAmount" class="block text-sm font-medium mb-1">Amount to Stake</label>
+                    <input type="number" id="stakeAmount" min="1" step="0.25" class="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.25" aria-describedby="stakeAmountHelp">
+                    <p id="stakeAmountHelp" class="text-xs text-gray-400 mt-1">Minimum stake: 0.25 DiFi</p>
+                </div>
+                <div>
+                    <label for="stakeDuration" class="block text-sm font-medium mb-1">Duration</label>
+                    <select id="stakeDuration" class="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="7">7 days (5% APY)</option>
+                        <option value="14">14 days (8% APY)</option>
+                        <option value="30">30 days (15% APY)</option>
+                    </select>
+                </div>
+                <button id="confirmStake" onclick="app.handleStake(
+                document.getElementById('stakeAmount').value,
+                document.getElementById('stakeDuration').value
+              )" 
+              class="w-full bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-md font-medium transition">Confirm Stake</button>
+            </div>
+        </div>
+    </div>
+
+            <!-- Swap Modal -->
+    <div id="swapModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Swap Tokens</h2>
+<button id="confirmSwap" onclick="app.handleTokenSwap(
+                document.getElementById('swapFromToken').value,
+                document.getElementById('swapFromAmount').value
+              )" 
+              class="w-full bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-md font-medium transition">
+                Confirm Swap
+            </button>
+            </div>
+
+            <!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ... (keep existing head content) ... -->
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <!-- ... (modal structure remains same) ... -->
+        <form id="loginForm" onsubmit="app.handleLogin(event)">
+            <!-- ... (keep existing login form fields) ... -->
+        </form>
+        
+        <form id="registerForm" onsubmit="app.handleRegister(event)" class="hidden">
+            <!-- ... (keep existing register form fields) ... -->
+        </form>
+        <!-- ... -->
+    </div>
+    
+    <div class="container mx-auto px-4">
+        <!-- ... (keep header content) ... -->
+        
+        <main class="py-8">
+            <section id="userDashboard" class="hidden">
+                <!-- ... -->
+                
+                <!-- Mining Section -->
+                <section class="bg-gray-800 rounded-xl p-6 shadow-lg mb-8">
+                    <!-- ... -->
+                    <button id="mineButton" onclick="app.handleMine()" 
+                        class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 py-3 px-6 rounded-md font-medium transition">
+                        Mine Now
+                    </button>
+                </section>
+
+                <!-- Tasks Section -->
+                <section class="bg-gray-800 rounded-xl p-6 shadow-lg mb-8">
+                    <div class="space-y-3" id="tasksContainer">
+                        <!-- Tasks will be dynamically inserted here -->
+                    </div>
+                </section>
+
+                <!-- Referral & DPower Sections -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- ... -->
+                    <button id="convertDpower" onclick="app.handleConvertDPower()" 
+                        class="flex-1 bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-md font-medium transition">
+                        Convert to DiFi
+                    </button>
+                    <button id="purchaseDpower" onclick="app.uiService.showPaymentModal()"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-md font-medium transition">
+                        Buy DPower
+                    </button>
+                </div>
+
+                <!-- Leaderboard (no changes needed) -->
+                <!-- ... -->
+            </section>
+            
+            <!-- Guest View -->
+            <section id="guestView" class="text-center py-12">
+                <button id="guestAuthButton" onclick="app.uiService.showAuthModal()" 
+                    class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-md font-medium text-lg transition">
+                    Login or Register to Start
+                </button>
+            </section>
+        </main>
+    </div>
+
+    <!-- Staking Modal -->
+    <div id="stakingModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+            <!-- ... -->
+            <button id="confirmStake" onclick="app.handleStake(
+                document.getElementById('stakeAmount').value,
+                document.getElementById('stakeDuration').value
+              )" 
+              class="w-full bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-md font-medium transition">
+                Confirm Stake
+            </button>
+        </div>
+    </div>
+
+    <!-- Swap Modal -->
+    <div id="swapModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+            <!-- ... -->
+            <button id="confirmSwap" onclick="app.handleTokenSwap(
+                document.getElementById('swapFromToken').value,
+                document.getElementById('swapFromAmount').value
+              )" 
+              class="w-full bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-md font-medium transition">
+                Confirm Swap
+            </button>
+        </div>
+    </div>
+
+    <!-- Payment Modal (Add this if not present) -->
+    <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Purchase DPower</h2>
+                <button onclick="app.uiService.hidePaymentModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label for="dpowerAmount" class="block text-sm font-medium mb-1">DPower Amount</label>
+                    <input type="number" id="dpowerAmount" min="10000" step="1000" 
+                        oninput="app.uiService.updatePaymentAmount()"
+                        class="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        value="10000">
+                </div>
+                <div>
+                    <p class="text-sm font-medium mb-1">Payment Amount</p>
+                    <p class="text-xl font-bold" id="paymentAmount">$5.00</p>
+                </div>
+                <div>
+                    <p class="text-sm font-medium mb-1">Send to Wallet</p>
+                    <div class="flex items-center bg-gray-700 px-3 py-2 rounded-md mt-1">
+                        <span id="paymentWalletDisplay" class="flex-1 font-mono text-sm"></span>
+                        <button onclick="app.uiService.copyToClipboard(
+                            document.getElementById('paymentWalletDisplay').textContent,
+                            this
+                          )" 
+                          class="ml-2 text-blue-400 hover:text-blue-300">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <button onclick="app.handlePurchaseDPower()" 
+                    class="w-full bg-green-600 hover:bg-green-700 py-2 px-4 rounded-md font-medium transition">
+                    Confirm Payment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <section id="adminPanel" class="hidden bg-gray-800 rounded-xl p-6 shadow-lg mb-8">
+        <h2 id="adminPanelHeading" class="text-xl font-bold mb-4">Admin Dashboard</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-700 p-4 rounded-lg">
+                <h3 class="font-medium mb-2">Total Users</h3>
+                <p class="text-2xl font-bold" id="totalUsers">0</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded-lg">
+                <h3 class="font-medium mb-2">Total DiFi Mined</h3>
+                <p class="text-2xl font-bold" id="totalDiFiMined">0</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded-lg">
+                <h3 class="font-medium mb-2">Active Stakes</h3>
+                <p class="text-2xl font-bold" id="activeStakes">0</p>
+            </div>
+        </div>
+        <button id="adjustRewards" onclick="app.adminService.adjustMiningRewards()" 
+            class="w-full bg-yellow-600 hover:bg-yellow-700 py-2 px-4 rounded-md font-medium transition">
+            Adjust Mining Rewards
+        </button>
+        <button id="viewAllUsers" onclick="app.adminService.viewAllUsers()" 
+            class="w-full bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-md font-medium transition">
+            View All Users
+        </button>
+    </section>
+
+    <script src="app.js"></script>
+     
+</body>
+</html>

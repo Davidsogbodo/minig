@@ -1,0 +1,87 @@
+:root {
+  /* Color system */
+  --primary: #3b82f6;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #f87171;
+  --gray-700: #374151;
+  
+  /* Transitions */
+  --transition-fast: all 0.15s ease;
+  --transition-normal: all 0.3s ease;
+  --transition-slow: all 0.5s ease;
+}
+
+/* ================
+   Core Animations
+   ================ */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ================
+   Interactive Elements
+   ================ */
+#mineButton {
+  transition: var(--transition-normal);
+}
+
+#mineButton.ready {
+  animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+  transform: translateZ(0); /* Hardware accelerate */
+}
+
+#mineButton:disabled {
+  background-color: var(--gray-700);
+  animation: none;
+}
+
+/* ================
+   Component Library
+   ================ */
+/* Badges */
+.badge {
+  display: inline-flex;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+.badge-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* Staking Cards */
+.staking-card {
+  transition: var(--transition-normal);
+  will-change: transform;
+  border-left: 4px solid;
+}
+
+.staking-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* ================
+   Responsive Overrides
+   ================ */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  #mobileMenu {
+    transition: max-height var(--transition-normal), 
+                opacity var(--transition-fast);
+  }
+}
